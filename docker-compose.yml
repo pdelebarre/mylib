@@ -1,7 +1,7 @@
 version: "3"
 services:
   mongo_db:
-    image: mongo:latest
+    image: mongo:4
     restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
@@ -10,8 +10,6 @@ services:
       - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
     volumes:
       - db:/data/db
-    # networks:
-    #   - mongodb
 
   bookappbackend:
     image: pdelebarre/bookappbackend:latest
@@ -23,41 +21,21 @@ services:
       SPRING_APPLICATION_JSON: '{
         "spring.data.mongodb.uri" : "mongodb://$MONGODB_USER:$MONGODB_PASSWORD@mongo_db:$MONGODB_DOCKER_PORT/$MONGODB_DATABASE?authSource=admin"
         }'
-    # volumes:
-    #   - .m2:/root/.m2
-    # stdin_open: true
-    # tty: true
     depends_on:
       - mongo_db
-    # networks:
-    #   - mongodb
-    #   - backend
 
   bookappfrontend:
     image: pdelebarre/book-app-frontend:main
     container_name: book-app-frontend
     restart: on-failure
-    # build:
-    #   context: ./book-app-frontend
-    #   dockerfile: Dockerfile
-    #   args:
-    #     - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
-    #     - REACT_APP_API_PORT=${REACT_APP_API_PORT}
     environment:
-      - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
-      - REACT_APP_API_PORT=${REACT_APP_API_PORT}
+      - BOOKAPP_API_BASE_URL=$BOOKAPP_API_BASE_URL
+      - BOOKAPP_API_PORT=$BOOKAPP_API_PORT
     ports:
-      - "3000:80"
+      - "3005:80"
     depends_on:
       - bookappbackend
-    # networks:
-    #   - frontend
-    #   - backend
 
 volumes:
   db:
-  
-# networks: 
-#   frontend:
-#   backend:
-#   mongodb:
+
