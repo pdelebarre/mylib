@@ -1,7 +1,10 @@
-version: "3"
+# on silicon run this first :
+# export DOCKER_DEFAULT_PLATFORM=linux/amd64
+# run this to test locally
+# BOOKAPP_API_BASE_URL=http://localhost docker compose up
 services:
   mongo_db:
-    image: mongo:4
+    image: mongo:4.4.29
     restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
@@ -12,8 +15,8 @@ services:
       - db:/data/db
 
   bookappbackend:
-    image: pdelebarre/bookappbackend:latest
-    container_name: bookappbackend
+    image: pdelebarre/book-app-backend:latest
+    container_name: book-app-backend
     restart: on-failure
     ports:
       - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
