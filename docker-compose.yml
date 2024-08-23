@@ -2,6 +2,7 @@
 # export DOCKER_DEFAULT_PLATFORM=linux/amd64
 # run this to test locally
 # BOOKAPP_API_BASE_URL=http://localhost docker compose up
+version: '3.8'
 
 services:
   mongo_db:
@@ -35,10 +36,18 @@ services:
     environment:
       - BOOKAPP_API_BASE_URL=$BOOKAPP_API_BASE_URL
       - BOOKAPP_API_PORT=$BOOKAPP_API_PORT
+      - PUSHGATEWAY_URL=http://pushgateway:9091   # Add this to allow frontend to push metrics
     ports:
       - "3005:80"
     depends_on:
       - bookappbackend
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: pushgateway
+    restart: unless-stopped
+    ports:
+      - "9091:9091"
 
   prometheus:
     image: prom/prometheus:latest
@@ -50,6 +59,7 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
       - bookappbackend  # Prometheus depends on the backend to scrape metrics from it
+      - pushgateway     # Prometheus will scrape metrics from Pushgateway as well
 
   grafana:
     image: grafana/grafana:latest
