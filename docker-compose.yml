@@ -28,7 +28,7 @@ services:
       - mongo_db
 
   bookappfrontend:
-    image: pdelebarre/book-app-frontend:main
+    image: pdelebarre/book-app-frontend:latest
     container_name: book-app-frontend
     restart: on-failure
     environment:
